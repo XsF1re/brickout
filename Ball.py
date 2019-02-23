@@ -9,14 +9,16 @@ class Ball:
         self.coord=[coord[0], coord[1]]
         self.radius=15
         print("new Ball")
-    # vectorDirection example : (1,0) (3,5)
 
+
+    # param:vectorDirection example : (1,0) (3,5)
     def move(self, vectorDirection):
         vector=self.adjustVector(vectorDirection)
         # print(vector)
         self.coord[0]+=math.ceil(float(vector[0])*self.SPEED)
         self.coord[1]+=math.ceil(float(vector[1])*self.SPEED)
-    #벡터값은 크기가 1이 되도록 한다
+
+    #크기가 1인 벡터로 변환하여 리턴해주는 함수
     def adjustVector(self, vectorDirection):
         # vectorSize=math.sqrt((vectorDirection[0])^2+(vectorDirection[1])^2)
         vectorSize=math.sqrt(vectorDirection[0]**2+vectorDirection[1]**2)

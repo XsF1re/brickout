@@ -1,6 +1,9 @@
+
+# 이 부분이 좀 문제
+# main과 연동이 안되어서 하나하나 바꾸어 줘야함...
 MAP_WIDTH=500
 MAP_HEIGHT=500
-GAME_AREA=(100,50,100+MAP_WIDTH, 50+MAP_HEIGHT)
+GAME_AREA=(30,30,30+MAP_WIDTH, 30+MAP_HEIGHT)
 
 
 class Brick:
