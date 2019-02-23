@@ -5,15 +5,25 @@ GAME_AREA=(100,50,100+MAP_WIDTH, 50+MAP_HEIGHT)
 
 class Brick:
     WIDTH=80
-    HEIGHT=30
-    def __init__(self, coord, HARDNESS):
+    HEIGHT=40
+    def __init__(self, topLeft, HARDNESS):
         # coord는 wall의 leftUpper coordinate
         # HARDNESS는 몇 대 때려야 깨지는지
         # attack은 맞은 회수
         print("Brick created")
-        self.coord=[coord[0], coord[1]]
+
+        # to input coordinates
+
+        self.topLeft=[topLeft[0], topLeft[1]]
+        self.topRight=[topLeft[0]+Brick.WIDTH, topLeft[1]]
+        self.bottomLeft=[topLeft[0], topLeft[1]+Brick.HEIGHT]
+        self.bottomRight=[topLeft[0]+Brick.WIDTH, topLeft[1]+Brick.HEIGHT]
+
+#임시
+        self.coord=[self.topLeft[0], self.topLeft[1]]
         self.attack=0
         self.HARDNESS=HARDNESS
+
     def hitBrick(self):
         self.attack+=1
         if(self.HARDNESS==self.attack):

@@ -1,3 +1,6 @@
+# test 코드를 작성해보겠다.
+# 위로 쭉 올라가는 방향의 공에게 어떻게 될지
+
 import pygame
 import pygame.gfxdraw
 import time
@@ -6,7 +9,7 @@ from Ball import Ball
 import Brick
 pygame.init()
 
-pygame.display.set_caption("break Bricks!")
+pygame.display.set_caption("break Bricksnot ")
 screen=pygame.display.set_mode((700, 600))
 screen.fill((255, 255, 255))
 clock=pygame.time.Clock()
@@ -18,29 +21,34 @@ GAME_AREA=(100,50,100+MAP_WIDTH, 50+MAP_HEIGHT)
 
 
 #게임 데이터들
-FPS=60
-FastFPS=True
-BAR_WIDTH=200
+FPS=30
+BAR_WIDTH=90
 BAR_HEIGHT=20
 BAR_MOVE_SPEED=20
 BALL_MOVE_SPEED=4
 game=True
 barCoord=[0,MAP_HEIGHT-BAR_HEIGHT]
 boundary=False  #끝에 닿았는지
-ball=Ball((300,300), 10)
-RANDOM_VECTOR_SPEED=90
-randomVectorCount=1;
-vectorDirection=[3,3];
+ball=Ball((310,50), 10)
+RANDOM_VECTOR_SPEED=10
+randomVectorCount=0
+vectorDirection=[3,3]
+
+# 우선 main.py의 설정 내용을 다 가져옴
+# 그중 바꿔야하는 요소들만 바꿔줌
+vectorDirection=[3,3]
+randomVectorCount=1
+RANDOM_VECTOR_SPEED=60
+
 
 # to create bricks and brickList
 brickList={}
-
-for i in range(6):
-    brickList[i]=Brick.Brick((Brick.Brick.WIDTH, Brick.Brick.HEIGHT*(i+1)), 3)
-    brickList[i+6]=Brick.Brick((Brick.Brick.WIDTH*3, Brick.Brick.HEIGHT*(i+1)), 3)
-    brickList[i+12]=Brick.Brick((Brick.Brick.WIDTH*5, Brick.Brick.HEIGHT*(i+1)), 3)
-
-
+#Ball을 세로로 생성해봄
+for i in range(3):
+    brickList[i]=Brick.Brick((100, 255+Brick.Brick.HEIGHT*i), 3)
+    brickList[i+3]=Brick.Brick((200, 255+Brick.Brick.HEIGHT*i), 3)
+    brickList[i+6]=Brick.Brick((300, 255+Brick.Brick.HEIGHT*i), 3)
+    brickList[i+9]=Brick.Brick((400, 255+Brick.Brick.HEIGHT*i), 3)
 
 
 # 여기부터는 main과 비슷
@@ -56,14 +64,12 @@ while game:
 
     if(keyState[pygame.K_RIGHT]):
         if(barCoord[0]>=MAP_WIDTH-BAR_WIDTH):
-            barCoord[0]=MAP_WIDTH-BAR_WIDTH
             boundary=True
         else :
             boundary=False
             barCoord[0]+=BAR_MOVE_SPEED
     elif(keyState[pygame.K_LEFT]):
         if(barCoord[0]<=0):
-            barCoord[0]=0
             boundary=True
         else :
             boundary=False
@@ -86,14 +92,6 @@ while game:
                 else:
                     boundary=False
                     barCoord[0]-=BAR_MOVE_SPEED/2
-            elif(event.key==pygame.K_f):
-                if(FastFPS==True):
-                    FastFPS=False
-                    FPS=40
-                else:
-                    FastFPS=True
-                    FPS=5
-
     #SPEED만큼 count가 차면 랜덤벡터생성
     if(randomVectorCount%RANDOM_VECTOR_SPEED==0):
         vectorDirection=[vectorDirection[0]+random.random()*4-2, vectorDirection[1]+random.random()*4-2]
@@ -103,32 +101,20 @@ while game:
     # check out if the ball crashes map
 
     if(ball.coord[0]<=0+ball.radius):
-        # print(vectorDirection)
-        if(vectorDirection[0]<0):
-
-            #print("-Wall and ball!")
-            vectorDirection[0]*=(-1)
-
+        crashX=True
+        crashXSign="negative"
     elif(ball.coord[0]>=MAP_WIDTH-ball.radius):
-        ball.coord[0]=MAP_WIDTH-ball.radius
-        # print(vectorDirection)
-        if(vectorDirection[0]>0):
-            #print("+Wall and ball!")
-            vectorDirection[0]*=(-1)
-    if(ball.coord[1]<=0+ball.radius):
-        print("Wall and ball!")
-        print(vectorDirection)
-        if(vectorDirection[1]<0):
-            vectorDirection[1]*=(-1)
-            print("modified")
-            print(vectorDirection)
+        crashX=True
+        crashXSign="positive"
+    elif(ball.coord[1]<=0+ball.radius):
+        crashY=True
+        crashYSign="negative"
 
     #check out if the ball crashes the bar
-    # if((ball.coord[0]+ball.radius>=barCoord[0] and ball.coord[0]-ball.radius<=barCoord[0]+BAR_WIDTH) and (ball.coord[1]+ball.radius>=barCoord[1])):
-    #     crashY=True
-    #     crashYSign="positive"
+    elif((ball.coord[0]+ball.radius>=barCoord[0] and ball.coord[0]-ball.radius<=barCoord[0]+BAR_WIDTH) and (ball.coord[1]+ball.radius>=barCoord[1])):
+        crashY=True
+        crashYSign="positive"
 
-    # ball의 radius는 현재 10으로 설정했음
     #check out if the ball crashes any brick
     else:
         for i in brickList:
@@ -138,8 +124,7 @@ while game:
             if(ball.coord[0]>=brick.topLeft[0]-ball.radius and
             ball.coord[0]<=brick.topLeft[0] and
             ball.coord[1]>=brick.topLeft[1] and
-            ball.coord[1]<=brick.bottomLeft[1] and
-            vectorDirection[0]>0):
+            ball.coord[1]<=brick.bottomLeft[1] and not crashX):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
                 print(1)
@@ -151,8 +136,7 @@ while game:
             elif(ball.coord[0]>=brick.topRight[0] and
             ball.coord[0]<=brick.topRight[0]+ball.radius and
             ball.coord[1]>=brick.topRight[1] and
-            ball.coord[1]<=brick.bottomRight[1] and
-            vectorDirection[0]<0):
+            ball.coord[1]<=brick.bottomRight[1] and not crashX):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
                 print(2)
@@ -163,8 +147,7 @@ while game:
             elif(ball.coord[0]>=brick.bottomLeft[0]and
             ball.coord[0]<=brick.bottomRight[0] and
             ball.coord[1]>=brick.bottomLeft[1] and
-            ball.coord[1]<=brick.bottomLeft[1]+ball.radius and
-            vectorDirection[1]<0):
+            ball.coord[1]<=brick.bottomLeft[1]+Brick.Brick.HEIGHT and not crashY):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
                 print(3)
@@ -175,8 +158,7 @@ while game:
             elif(ball.coord[0]>=brick.topLeft[0]and
             ball.coord[0]<=brick.topRight[0] and
             ball.coord[1]>=brick.topLeft[1]-ball.radius and
-            ball.coord[1]<=brick.topLeft[1] and
-            vectorDirection[1]>0):
+            ball.coord[1]<=brick.topLeft[1] and not crashY):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
                 print(4)
@@ -232,10 +214,10 @@ while game:
                 vectorDirection=[float(float(tempBallVector[0])+float(tempSlopeVecotr[0])), float(float(tempBallVector[1])+float(tempSlopeVecotr[1]))]
                 break
             # 오른쪽 대각선 아래에서 오는 것
-            elif(ball.coord[0]>=brick.bottomRight[0] and
-            ball.coord[0]<=brick.bottomRight[0]+ball.radius and
-            ball.coord[1]>=brick.bottomRight[1] and
-            ball.coord[1]<=brick.bottomRight[1]+ball.radius and not crashX and not crashY):
+            elif(ball.coord[0]>=brick.bottomLeft[0] and
+            ball.coord[0]<=brick.bottomLeft[0]+ball.radius and
+            ball.coord[1]>=brick.bottomLeft[1] and
+            ball.coord[1]<=brick.bottomLeft[1]+ball.radius and not crashX and not crashY):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
                 print(8)
@@ -251,7 +233,6 @@ while game:
 
     # X좌표가 무엇인가와 충돌했는데
     if(crashX):
-        print("X crashed")
         if(crashXSign=="negative"):
             if(vectorDirection[0]<0):
                 vectorDirection[0]*=(-1)
@@ -264,7 +245,6 @@ while game:
 
     # y좌표가 무엇인가와 충돌했는데
     if(crashY):
-        print("Y crashed")
         if(crashYSign=="negative"):
             if(vectorDirection[1]<0):
                 vectorDirection[1]*=(-1)
@@ -274,18 +254,13 @@ while game:
                 vectorDirection[1]*=(-1)
                 randomVectorCount=1
 
-    # bar과 충돌했을 때
+            # 벽과 충돌했을 때
+            if(vectorDirection[1]>0 and (ball.coord[0]+ball.radius>=barCoord[0] and ball.coord[0]-ball.radius<=barCoord[0]+BAR_WIDTH)):
+                print("crash bar")
+                vectorDirection[1]*=(-1)
+                randomVectorCount=1
 
-    if(vectorDirection[1]>0 and (ball.coord[0]+ball.radius>=barCoord[0] and
-    ball.coord[0]-ball.radius<=barCoord[0]+BAR_WIDTH and
-    ball.coord[1]>=barCoord[1]-ball.radius and
-    ball.coord[1]<=barCoord[1])):
-        print("crash bar")
-        ball.coord[1]=barCoord[1]-ball.radius
-        vectorDirection[1]*=(-1)
-        randomVectorCount=1
-
-    if(ball.coord[1]>MAP_HEIGHT): ball=Ball((300,300), 10)
+    if(ball.coord[1]>MAP_HEIGHT): ball=Ball((100,100), 10)
     # DRAWING BEGINS
     screen.fill((255, 255, 255))
     # pygame.gfxdraw.filled_polygon(screen, ( (GAME_AREA[0],GAME_AREA[1]), (GAME_AREA[2],GAME_AREA[1]), (GAME_AREA[2], GAME_AREA[3]), (GAME_AREA[0], GAME_AREA[3]) ), (30,30,30))
