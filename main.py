@@ -2,23 +2,42 @@ import pygame
 import pygame.gfxdraw
 import time
 import random
+import sys
+import os
 from Ball import Ball
 import Brick
+
+class drawRainbow:
+    ROUGH_MAX=245 # 대략적인 최대값
+    def __init__(self, FPS):
+        self.rgbUnit=int(255/FPS) # 한 번의 FPS마다 증가될 컬러값의 기본값
+        self.rgb=[0,0,0]
+    def adjustRGB(self):
+        if(self.rgb[0]<=drawRainbow.ROUGH_MAX):
+            self.rgb[0]+=self.rgbUnit
+            # self.rgb[0]/=255 # 나머지 값으로 저장
+        elif(self.rgb[1]<=drawRainbow.ROUGH_MAX):
+            self.rgb[1]+=self.rgbUnit
+            # self.rgb[1]/=255
+        elif(self.rgb[2]<=drawRainbow.ROUGH_MAX):
+            self.rgb[2]+=self.rgbUnit
+            # self.rgb[2]/=255
+        else:
+            self.rgb=[0,0,0]
+
+
 pygame.init()
 
 pygame.display.set_caption("break Bricks!")
-screen=pygame.display.set_mode((700, 600))
-screen.fill((255, 255, 255))
+screen=pygame.display.set_mode((850, 900))
 clock=pygame.time.Clock()
 
-
+LOGO_IMAGE=pygame.image.load(os.path.join("logo.png"))
 MAP_WIDTH=500
 MAP_HEIGHT=500
 GAME_AREA=(100,50,100+MAP_WIDTH, 50+MAP_HEIGHT)
-
-
 #게임 데이터들
-FPS=60
+FPS=50
 FastFPS=True
 BAR_WIDTH=200
 BAR_HEIGHT=20
@@ -30,7 +49,8 @@ boundary=False  #끝에 닿았는지
 ball=Ball((300,300), 10)
 RANDOM_VECTOR_SPEED=90
 randomVectorCount=1;
-vectorDirection=[3,3];
+vectorDirection=[3,3]
+drawRainbow=drawRainbow(FPS)
 
 # to create bricks and brickList
 brickList={}
@@ -39,9 +59,6 @@ for i in range(6):
     brickList[i]=Brick.Brick((Brick.Brick.WIDTH, Brick.Brick.HEIGHT*(i+1)), 3)
     brickList[i+6]=Brick.Brick((Brick.Brick.WIDTH*3, Brick.Brick.HEIGHT*(i+1)), 3)
     brickList[i+12]=Brick.Brick((Brick.Brick.WIDTH*5, Brick.Brick.HEIGHT*(i+1)), 3)
-
-
-
 
 # 여기부터는 main과 비슷
 
@@ -93,12 +110,23 @@ while game:
                 else:
                     FastFPS=True
                     FPS=5
-
+            elif(event.key==pygame.K_a):
+                print ("vector adjusted")
+                print(vectorDirection)
+                c=0
+                while(c<=10):   #일단 10번만
+                    vectorDirection[0]=random.randint(-10,10)
+                    vectorDirection[1]=random.randint(-3,3)
+                    if(vectorDirection[0]==0 or vectorDirection[1]==0):c-=1
+                    c+=1
+                print(vectorDirection)
     #SPEED만큼 count가 차면 랜덤벡터생성
-    if(randomVectorCount%RANDOM_VECTOR_SPEED==0):
-        vectorDirection=[vectorDirection[0]+random.random()*4-2, vectorDirection[1]+random.random()*4-2]
-        randomVectorCount=0
-    randomVectorCount+=1
+    # 잠시 random vector cease
+    # if(randomVectorCount%RANDOM_VECTOR_SPEED==0):
+    #     vectorDirection=[vectorDirection[0]+random.random()*4-2, vectorDirection[1]+random.random()*4-2]
+    #     print("random vector!!!")
+    #     randomVectorCount=0
+    # randomVectorCount+=1
 
     # check out if the ball crashes map
 
@@ -120,8 +148,6 @@ while game:
         print(vectorDirection)
         if(vectorDirection[1]<0):
             vectorDirection[1]*=(-1)
-            print("modified")
-            print(vectorDirection)
 
     #check out if the ball crashes the bar
     # if((ball.coord[0]+ball.radius>=barCoord[0] and ball.coord[0]-ball.radius<=barCoord[0]+BAR_WIDTH) and (ball.coord[1]+ball.radius>=barCoord[1])):
@@ -255,11 +281,11 @@ while game:
         if(crashXSign=="negative"):
             if(vectorDirection[0]<0):
                 vectorDirection[0]*=(-1)
-                randomVectorCount=1 #시간 초기화
+                #randomVectorCount=1 #시간 초기화
         if(crashXSign=="positive"):
             if(vectorDirection[0]>0):
                 vectorDirection[0]*=(-1)
-                randomVectorCount=1
+                #randomVectorCount=1
             vectorDirection
 
     # y좌표가 무엇인가와 충돌했는데
@@ -268,11 +294,11 @@ while game:
         if(crashYSign=="negative"):
             if(vectorDirection[1]<0):
                 vectorDirection[1]*=(-1)
-                randomVectorCount=1
+                # randomVectorCount=1
         if(crashYSign=="positive"):
             if(vectorDirection[1]>0):
                 vectorDirection[1]*=(-1)
-                randomVectorCount=1
+                # randomVectorCount=1
 
     # bar과 충돌했을 때
 
@@ -283,11 +309,12 @@ while game:
         print("crash bar")
         ball.coord[1]=barCoord[1]-ball.radius
         vectorDirection[1]*=(-1)
-        randomVectorCount=1
+        # randomVectorCount=1
 
     if(ball.coord[1]>MAP_HEIGHT): ball=Ball((300,300), 10)
     # DRAWING BEGINS
     screen.fill((255, 255, 255))
+
     # pygame.gfxdraw.filled_polygon(screen, ( (GAME_AREA[0],GAME_AREA[1]), (GAME_AREA[2],GAME_AREA[1]), (GAME_AREA[2], GAME_AREA[3]), (GAME_AREA[0], GAME_AREA[3]) ), (30,30,30))
     #draw game area
     pygame.draw.rect(screen, (30, 30, 30), (GAME_AREA[0], GAME_AREA[1], MAP_WIDTH, MAP_HEIGHT), 3)
@@ -301,4 +328,7 @@ while game:
     else:
         # GAME_AREA=(100,50,100+MAP_WIDTH, 50+MAP_HEIGHT)
         pygame.draw.rect(screen, (0,200,200), (barCoord[0]++GAME_AREA[0], barCoord[1]++GAME_AREA[1], BAR_WIDTH, BAR_HEIGHT), 5)
+    screen.blit(LOGO_IMAGE, (650,100))
+    # pygame.draw.line(screen, drawRainbow.rgb, (650,140), (800,140), 15)
+    # drawRainbow.adjustRGB()
     pygame.display.flip()
