@@ -8,6 +8,8 @@ import os
 from Ball import Ball
 import Brick
 
+import vectorReflecting
+
 class drawRainbow:
     ROUGH_MAX=245 # 대략적인 최대값
     def __init__(self, FPS):
@@ -38,30 +40,42 @@ MAP_WIDTH=500
 MAP_HEIGHT=500
 GAME_AREA=(30,30,30+MAP_WIDTH, 30+MAP_HEIGHT)
 #게임 데이터들
-FPS=40
-FAST_FPS=40
-SLOW_FPS=20
+FPS=50
+FAST_FPS=50
+SLOW_FPS=10
 BAR_WIDTH=200
 BAR_HEIGHT=20
 BAR_MOVE_SPEED=20
 BALL_MOVE_SPEED=4
 game=True
-barCoord=[0,MAP_HEIGHT-BAR_HEIGHT]
+barCoord=[(MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT]
 boundary=False  #끝에 닿았는지
-ball=Ball((90,300), 10)
+
 RANDOM_VECTOR_SPEED=90
 randomVectorCount=1;
-vectorDirection=[1,-3]
+
+vectorDirection=[2,-1.5]
+ball=Ball((100,300), 10)
+
 drawRainbow=drawRainbow(FPS)
 
 # to create bricks and brickList
 brickList={}
 
 #초기 bricks 생성
-for i in range(6):
-    brickList[i]=Brick.Brick((120, Brick.Brick.HEIGHT*i), 3)
-    brickList[i+6]=Brick.Brick((300, Brick.Brick.HEIGHT*i), 3)
 
+def initGameDefault():
+    for i in range(4):
+        brickList[i]=Brick.Brick((120, Brick.Brick.HEIGHT*i), 2)
+        brickList[i+6]=Brick.Brick((300, Brick.Brick.HEIGHT*i), 2)
+def initTestBricks():
+    for i in range(6):
+        brickList[i]=Brick.Brick((250, Brick.Brick.HEIGHT*i), 1)
+        print(brickList[i].topLeft)
+        print(brickList[i].bottomLeft)
+
+# initTestBricks()
+initGameDefault()
 while game:
 
     # FPS를 이용해 진행 속도 설정
@@ -200,11 +214,19 @@ while game:
                     if(brickList[i].hitBrick()):del brickList[i]
                     print(5)
 
-                    # ball의 adjustVector 메소드를 빌림
-                    tempBallVector=ball.adjustVector(vectorDirection)
-                    tempSlopeVecotr=ball.adjustVector([ball.coord[0]-brick.topLeft[0], ball.coord[1]-brick.topLeft[1]])
-                    vectorDirection=[float(float(tempBallVector[0])+float(tempSlopeVecotr[0])), float(float(tempBallVector[1])+float(tempSlopeVecotr[1]))]
-                    break
+                    isNeighborBrick=False
+                    # 위아래 네이버만 찾을게 일단.....
+                    for innerIndex in brickList :
+                        if(brick.topLeft==brickList[innerIndex].bottomLeft):
+                            isNeighborBrick=True
+                            break
+                    if(isNeighborBrick and vectorDirection[0]>=0):
+                        vectorDirection[0]*=(-1)
+                        break
+                    else:
+                        slope=vectorReflecting.getVerticalVector([ball.coord[0]-brick.topLeft[0], ball.coord[1]-brick.topLeft[1]])
+                        vectorDirection=vectorReflecting.getReflectedVector(slope, vectorDirection)
+                        break
                 # 오른쪽 대각선 위에서 오는 것
                 elif(ball.coord[0]>=brick.topRight[0] and
                 ball.coord[0]<=brick.topRight[0]+ball.radius and
@@ -215,10 +237,22 @@ while game:
                     print(6)
 
                     # ball의 adjustVector 메소드를 빌림
-                    tempBallVector=ball.adjustVector(vectorDirection)
-                    tempSlopeVecotr=ball.adjustVector([ball.coord[0]-brick.topRight[0], ball.coord[1]-brick.topRight[1]])
-                    vectorDirection=[float(float(tempBallVector[0])+float(tempSlopeVecotr[0])), float(float(tempBallVector[1])+float(tempSlopeVecotr[1]))]
-                    break
+                    # tempBallVector=ball.adjustVector(vectorDirection)
+                    # tempSlopeVecotr=ball.adjustVector([ball.coord[0]-brick.topRight[0], ball.coord[1]-brick.topRight[1]])
+                    # vectorDirection=[float(float(tempBallVector[0])+float(tempSlopeVecotr[0])), float(float(tempBallVector[1])+float(tempSlopeVecotr[1]))]
+                    isNeighborBrick=False
+                    # 위아래 네이버만 찾을게 일단.....
+                    for innerIndex in brickList :
+                        if(brick.topRight==brickList[innerIndex].bottomRight):
+                            isNeighborBrick=True
+                            break
+                    if(isNeighborBrick and vectorDirection[0]<=0):
+                        vectorDirection[0]*=(-1)
+                        break
+                    else:
+                        slope=vectorReflecting.getVerticalVector([ball.coord[0]-brick.topRight[0], ball.coord[1]-brick.topRight[1]])
+                        vectorDirection=vectorReflecting.getReflectedVector(slope, vectorDirection)
+                        break
 
                 # 왼쪽 대각선 아래에서 오는 것
                 elif(ball.coord[0]>=brick.bottomLeft[0]-ball.radius and
@@ -229,11 +263,23 @@ while game:
                     if(brickList[i].hitBrick()):del brickList[i]
                     print(7)
 
-                    # ball의 adjustVector 메소드를 빌림
-                    tempBallVector=ball.adjustVector(vectorDirection)
-                    tempSlopeVecotr=ball.adjustVector([ball.coord[0]-brick.bottomLeft[0], ball.coord[1]-brick.bottomLeft[1]])
-                    vectorDirection=[float(float(tempBallVector[0])+float(tempSlopeVecotr[0])), float(float(tempBallVector[1])+float(tempSlopeVecotr[1]))]
-                    break
+                    isNeighborBrick=False
+                    # 위아래 네이버만 찾을게 일단.....
+                    for innerIndex in brickList:
+                        if(brick.bottomLeft==brickList[innerIndex].topLeft):
+                            isNeighborBrick=True
+                            print("neighbor 발견")
+                            break
+                    if(isNeighborBrick):
+                        if(vectorDirection[0]>=0):
+                            print("neighbor발견했고 벡터가 여전히 양의 방향으로 향하므로 -1 곱해")
+                            vectorDirection[0]*=(-1)
+                            break
+                    else:
+                        print("vectorReflect로 튕김")
+                        slope=vectorReflecting.getVerticalVector([ball.coord[0]-brick.bottomLeft[0], ball.coord[1]-brick.bottomLeft[1]])
+                        vectorDirection=vectorReflecting.getReflectedVector(slope, vectorDirection)
+                        break
                 # 오른쪽 대각선 아래에서 오는 것
                 elif(ball.coord[0]>=brick.bottomRight[0] and
                 ball.coord[0]<=brick.bottomRight[0]+ball.radius and
@@ -242,12 +288,19 @@ while game:
                     # hitBrick이 True를 리턴하면 부셔진 것임
                     if(brickList[i].hitBrick()):del brickList[i]
                     print(8)
-
-                    # ball의 adjustVector 메소드를 빌림
-                    tempBallVector=ball.adjustVector(vectorDirection)
-                    tempSlopeVecotr=ball.adjustVector([ball.coord[0]-brick.bottomRight[0], ball.coord[1]-brick.bottomRight[1]])
-                    vectorDirection=[float(float(tempBallVector[0])+float(tempSlopeVecotr[0])), float(float(tempBallVector[1])+float(tempSlopeVecotr[1]))]
-                    break
+                    isNeighborBrick=False
+                    # 위아래 네이버만 찾을게 일단.....
+                    for innerIndex in brickList :
+                        if(brick.bottomRight==brickList[innerIndex].topRight):
+                            isNeighborBrick=True
+                            break
+                    if(isNeighborBrick and vectorDirection[0]<=0):
+                        vectorDirection[0]*=(-1)
+                        break
+                    else:
+                        slope=vectorReflecting.getVerticalVector([ball.coord[0]-brick.bottomRight[0], ball.coord[1]-brick.bottomRight[1]])
+                        vectorDirection=vectorReflecting.getReflectedVector(slope, vectorDirection)
+                        break
 
     # bar과 ball이 충돌했을 때
     if(vectorDirection[1]>0 and (ball.coord[0]+ball.radius>=barCoord[0] and
@@ -291,5 +344,5 @@ while game:
     writeGuideText("key 'F' means", 550, 200+lineHeight*lineCount)
     lineCount+=1
     writeGuideText("to change FPS", 550, 200+lineHeight*lineCount)
-    
+
     pygame.display.flip()
