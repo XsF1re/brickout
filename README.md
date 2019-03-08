@@ -1,6 +1,6 @@
 # Preview
 <div>
-  <img src="https://media.giphy.com/media/U7qNDCCr11NymHssyC/giphy.gif">
+  <img src=""https://media.giphy.com/media/LqxyMgCtuTm4jeLPU5/giphy.gif>
 </div>
 
 # python Tutorial pygame을 이용한 벽돌깨기
