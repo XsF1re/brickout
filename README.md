@@ -1,9 +1,9 @@
+# Python Tutorial _ pygame을 이용한 벽돌깨기
+
 # Preview
 <div>
-  <img src=""https://media.giphy.com/media/LqxyMgCtuTm4jeLPU5/giphy.gif>
+  <img src="https://media.giphy.com/media/LqxyMgCtuTm4jeLPU5/giphy.gif">
 </div>
-
-# python Tutorial pygame을 이용한 벽돌깨기
 
 # 요점
 코딩자체는 쉬우나 공이 벽돌의 __모서리 부분에서 튕겼을__ 경우
