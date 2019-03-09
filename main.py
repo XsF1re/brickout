@@ -45,7 +45,7 @@ FAST_FPS=50
 SLOW_FPS=10
 BAR_WIDTH=200
 BAR_HEIGHT=20
-BAR_MOVE_SPEED=20
+BAR_MOVE_WIDTH=20
 BALL_MOVE_SPEED=4
 game=True
 barCoord=[(MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT]
@@ -64,17 +64,30 @@ brickList={}
 
 #초기 bricks 생성
 
+def cutAtBoundary() : # 만약 boundary에 닿았을 경우 더 넘어가지 않도록
+    # bar의 x는 0부터 MAP_WIDTH인 셈
+    # MAP이 게임상의 좌표고 전체 게임 창은 신경 안 써도 된다고 보면 됨.
+    barMINX=0
+    barMAXX= MAP_WIDTH - BAR_WIDTH
+    mediumX=barMAXX//2 ## 대충 왼쪽에 bar을 붙일 지 오른쪽에 붙일 지를 판별하는 녀석
+    if(barCoord[0]<mediumX):
+        barCoord[0]=barMINX
+
+    else:
+        barCoord[0]=barMAXX
+
+
 def initGameDefault():
     for i in range(4):
         brickList[i]=Brick.Brick((120, Brick.Brick.HEIGHT*i), 2)
         brickList[i+6]=Brick.Brick((300, Brick.Brick.HEIGHT*i), 2)
-def initTestBricks():
+def initGameTest():
     for i in range(6):
         brickList[i]=Brick.Brick((250, Brick.Brick.HEIGHT*i), 1)
         print(brickList[i].topLeft)
         print(brickList[i].bottomLeft)
 
-# initTestBricks()
+# initGameTest()
 initGameDefault()
 while game:
 
@@ -85,20 +98,21 @@ while game:
     keyState=pygame.key.get_pressed()
 
     if(keyState[pygame.K_RIGHT]):
-        if(barCoord[0]>=MAP_WIDTH-BAR_WIDTH):
+        if(barCoord[0]>=MAP_WIDTH-BAR_WIDTH-BAR_MOVE_WIDTH):
+
             # 0으로 만들어주거나 MAP_WIDTH-BAR_WIDTH로 만들어 줘야 삐져나오지 않을 수 있음
-            barCoord[0]=MAP_WIDTH-BAR_WIDTH
+            cutAtBoundary()
             boundary=True
         else :
             boundary=False
-            barCoord[0]+=BAR_MOVE_SPEED
+            barCoord[0]+=BAR_MOVE_WIDTH
     elif(keyState[pygame.K_LEFT]):
-        if(barCoord[0]<=0):
-            barCoord[0]=0
+        if(barCoord[0]<=0+BAR_MOVE_WIDTH):
+            cutAtBoundary()
             boundary=True
         else :
             boundary=False
-            barCoord[0]-=BAR_MOVE_SPEED
+            barCoord[0]-=BAR_MOVE_WIDTH
 
     # pygame의 event를 받아봄
     for event in pygame.event.get():
@@ -107,18 +121,20 @@ while game:
             game=False
 
         elif event.type == pygame.KEYDOWN:
+            #오른쪽키
             if(event.key==pygame.K_RIGHT):
                 if(barCoord[0]>=MAP_WIDTH-BAR_WIDTH):
                     boundary=True
                 else :
                     boundary=False
-                    barCoord[0]+=BAR_MOVE_SPEED/2
+                    barCoord[0]+= BAR_MOVE_WIDTH / 3
+            # 왼쪽
             elif(event.key==pygame.K_LEFT):
                 if(barCoord[0]<=0):
                     boundary=True
                 else:
                     boundary=False
-                    barCoord[0]-=BAR_MOVE_SPEED/2
+                    barCoord[0]-= BAR_MOVE_WIDTH / 3
             elif(event.key==pygame.K_f):
                 # FAST와 SLOW FPS로 교대
                 if(FPS==FAST_FPS):
