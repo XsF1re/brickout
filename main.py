@@ -8,6 +8,8 @@ import os
 from Ball import Ball
 import Brick
 
+# import custom py files
+import Bar
 import vectorReflecting
 
 class drawRainbow:
@@ -40,7 +42,7 @@ MAP_WIDTH=500
 MAP_HEIGHT=500
 GAME_AREA=(30,30,30+MAP_WIDTH, 30+MAP_HEIGHT)
 #게임 데이터들
-FPS=50
+FPS=10
 FAST_FPS=50
 SLOW_FPS=10
 BAR_WIDTH=200
@@ -48,14 +50,15 @@ BAR_HEIGHT=20
 BAR_MOVE_WIDTH=20
 BALL_MOVE_SPEED=4
 game=True
+bar=Bar.Bar(((MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT))
 barCoord=[(MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT]
 boundary=False  #끝에 닿았는지
 
 RANDOM_VECTOR_SPEED=90
 randomVectorCount=1;
 
-vectorDirection=[2,-1.5]
-ball=Ball((100,300), 10)
+vectorDirection=[-2,0.5]
+ball=Ball((470,186), 10)
 
 drawRainbow=drawRainbow(FPS)
 
@@ -64,26 +67,27 @@ brickList={}
 
 #초기 bricks 생성
 
-def cutAtBoundary() : # 만약 boundary에 닿았을 경우 더 넘어가지 않도록
-    # bar의 x는 0부터 MAP_WIDTH인 셈
-    # MAP이 게임상의 좌표고 전체 게임 창은 신경 안 써도 된다고 보면 됨.
-    barMINX=0
-    barMAXX= MAP_WIDTH - BAR_WIDTH
-    mediumX=barMAXX//2 ## 대충 왼쪽에 bar을 붙일 지 오른쪽에 붙일 지를 판별하는 녀석
-    if(barCoord[0]<mediumX):
-        barCoord[0]=barMINX
-
-    else:
-        barCoord[0]=barMAXX
+# def cutAtBoundary() : # 만약 boundary에 닿았을 경우 더 넘어가지 않도록
+#     # bar의 x는 0부터 MAP_WIDTH인 셈
+#     # MAP이 게임상의 좌표고 전체 게임 창은 신경 안 써도 된다고 보면 됨.
+#     barMINX=0
+#     barMAXX= MAP_WIDTH - BAR_WIDTH
+#     mediumX=barMAXX//2 ## 대충 왼쪽에 bar을 붙일 지 오른쪽에 붙일 지를 판별하는 녀석
+#     if(bar.getX()<mediumX):
+#         bar.setX(barMINX)
+#
+#     else:
+#         bar.setX(barMAXX)
 
 
 def initGameDefault():
-    for i in range(4):
+    for i in range(5):
         brickList[i]=Brick.Brick((120, Brick.Brick.HEIGHT*i), 2)
-        brickList[i+6]=Brick.Brick((300, Brick.Brick.HEIGHT*i), 2)
+        brickList[i+5]=Brick.Brick((300, Brick.Brick.HEIGHT*i), 2)
 def initGameTest():
-    for i in range(6):
-        brickList[i]=Brick.Brick((250, Brick.Brick.HEIGHT*i), 1)
+    for i in range(4):
+        brickList[i]=Brick.Brick((250, 200+Brick.Brick.HEIGHT*i), 1)
+        brickList[i+4] = Brick.Brick((50, 200 + Brick.Brick.HEIGHT * i), 1)
         print(brickList[i].topLeft)
         print(brickList[i].bottomLeft)
 
@@ -96,23 +100,26 @@ while game:
 
     # 눌려있는 key 정보 받음
     keyState=pygame.key.get_pressed()
-
+    boundary=False # 초깃값은 False
     if(keyState[pygame.K_RIGHT]):
-        if(barCoord[0]>=MAP_WIDTH-BAR_WIDTH-BAR_MOVE_WIDTH):
 
-            # 0으로 만들어주거나 MAP_WIDTH-BAR_WIDTH로 만들어 줘야 삐져나오지 않을 수 있음
-            cutAtBoundary()
-            boundary=True
-        else :
-            boundary=False
-            barCoord[0]+=BAR_MOVE_WIDTH
+        boundary=bar.moveBar("RIGHT")
+        # if(bar.getX()>=MAP_WIDTH-BAR_WIDTH-BAR_MOVE_WIDTH):
+        #     # 0으로 만들어주거나 MAP_WIDTH-BAR_WIDTH로 만들어 줘야 삐져나오지 않을 수 있음
+        #     cutAtBoundary()
+        #     boundary=True
+        # else :
+        #     boundary=False
+        #     barCoord[0]+=BAR_MOVE_WIDTH
     elif(keyState[pygame.K_LEFT]):
-        if(barCoord[0]<=0+BAR_MOVE_WIDTH):
-            cutAtBoundary()
-            boundary=True
-        else :
-            boundary=False
-            barCoord[0]-=BAR_MOVE_WIDTH
+        boundary=bar.moveBar("LEFT")
+
+        # if(bar.getX()<=0+BAR_MOVE_WIDTH):
+        #     cutAtBoundary()
+        #     boundary=True
+        # else :
+        #     boundary=False
+        #     barCoord[0]-=BAR_MOVE_WIDTH
 
     # pygame의 event를 받아봄
     for event in pygame.event.get():
@@ -123,18 +130,21 @@ while game:
         elif event.type == pygame.KEYDOWN:
             #오른쪽키
             if(event.key==pygame.K_RIGHT):
-                if(barCoord[0]>=MAP_WIDTH-BAR_WIDTH):
-                    boundary=True
-                else :
-                    boundary=False
-                    barCoord[0]+= BAR_MOVE_WIDTH / 3
+                boundary = bar.moveBar("RIGHT")
+
+                # if(bar.getX()>=MAP_WIDTH-BAR_WIDTH):
+                #     boundary=True
+                # else :
+                #     boundary=False
+                #     barCoord[0]+= BAR_MOVE_WIDTH / 3
             # 왼쪽
             elif(event.key==pygame.K_LEFT):
-                if(barCoord[0]<=0):
-                    boundary=True
-                else:
-                    boundary=False
-                    barCoord[0]-= BAR_MOVE_WIDTH / 3
+                boundary = bar.moveBar("LEFT")
+                # if(bar.getX()<=0):
+                #     boundary=True
+                # else:
+                #     boundary=False
+                #     barCoord[0]-= BAR_MOVE_WIDTH / 3
             elif(event.key==pygame.K_f):
                 # FAST와 SLOW FPS로 교대
                 if(FPS==FAST_FPS):
@@ -151,6 +161,8 @@ while game:
                     vectorDirection[1]=random.randint(-3,3)
                     if(vectorDirection[0]==0 or vectorDirection[1]==0):c-=1
                     c+=1
+            elif(event.key==pygame.K_q):
+                game=False
 
     if(ball.coord[0]<=0+ball.radius):
         if(vectorDirection[0]<0):
@@ -284,15 +296,12 @@ while game:
                     for innerIndex in brickList:
                         if(brick.bottomLeft==brickList[innerIndex].topLeft):
                             isNeighborBrick=True
-                            print("neighbor 발견")
                             break
                     if(isNeighborBrick):
                         if(vectorDirection[0]>=0):
-                            print("neighbor발견했고 벡터가 여전히 양의 방향으로 향하므로 -1 곱해")
                             vectorDirection[0]*=(-1)
                             break
                     else:
-                        print("vectorReflect로 튕김")
                         slope=vectorReflecting.getVerticalVector([ball.coord[0]-brick.bottomLeft[0], ball.coord[1]-brick.bottomLeft[1]])
                         vectorDirection=vectorReflecting.getReflectedVector(slope, vectorDirection)
                         break
@@ -319,11 +328,11 @@ while game:
                         break
 
     # bar과 ball이 충돌했을 때
-    if(vectorDirection[1]>0 and (ball.coord[0]+ball.radius>=barCoord[0] and
-    ball.coord[0]-ball.radius<=barCoord[0]+BAR_WIDTH and
-    ball.coord[1]>=barCoord[1]-ball.radius and
-    ball.coord[1]<=barCoord[1])):
-        ball.coord[1]=barCoord[1]-ball.radius
+    if(vectorDirection[1]>0 and (ball.coord[0]+ball.radius>=bar.getX() and
+    ball.coord[0]-ball.radius<=bar.getX()+BAR_WIDTH and
+    ball.coord[1]>=bar.getY()-ball.radius and
+    ball.coord[1]<=bar.getY())):
+        ball.coord[1]=bar.getY()-ball.radius
         vectorDirection[1]*=(-1)
 
     if(ball.coord[1]>MAP_HEIGHT): ball=Ball((300,300), 10)
@@ -339,11 +348,11 @@ while game:
     for brick in brickList:
         brickList[brick].draw(pygame.draw, screen)
     pygame.draw.circle(screen, (0,150,230),(ball.coord[0]+GAME_AREA[0], ball.coord[1]+GAME_AREA[1]), ball.radius, 3)
-    if(boundary):
-        pygame.draw.rect(screen, (150,0,0), (barCoord[0]+GAME_AREA[0], barCoord[1]+GAME_AREA[1], BAR_WIDTH, BAR_HEIGHT), 5)
+    if(boundary=="CRUSH"):
+        pygame.draw.rect(screen, (150,0,0), (bar.getX()+GAME_AREA[0], bar.getY()+GAME_AREA[1], BAR_WIDTH, BAR_HEIGHT), 5)
     else:
         # GAME_AREA=(100,50,100+MAP_WIDTH, 50+MAP_HEIGHT)
-        pygame.draw.rect(screen, (0,200,200), (barCoord[0]++GAME_AREA[0], barCoord[1]++GAME_AREA[1], BAR_WIDTH, BAR_HEIGHT), 5)
+        pygame.draw.rect(screen, (0,200,200), (bar.getX()++GAME_AREA[0], bar.getY()+GAME_AREA[1], BAR_WIDTH, BAR_HEIGHT), 5)
     screen.blit(LOGO_IMAGE, (550,100))
 
     #글자쓰기.. 까다로운듯
