@@ -42,9 +42,9 @@ MAP_WIDTH=500
 MAP_HEIGHT=500
 GAME_AREA=(30,30,30+MAP_WIDTH, 30+MAP_HEIGHT)
 #게임 데이터들
-FPS=10
 FAST_FPS=50
 SLOW_FPS=10
+FPS=FAST_FPS
 BAR_WIDTH=200
 BAR_HEIGHT=20
 BAR_MOVE_WIDTH=20
@@ -57,8 +57,8 @@ boundary=False  #끝에 닿았는지
 RANDOM_VECTOR_SPEED=90
 randomVectorCount=1;
 
-vectorDirection=[-2,0.5]
-ball=Ball((470,186), 10)
+vectorDirection=[-2,1]
+ball=Ball((30,30), 10)
 
 drawRainbow=drawRainbow(FPS)
 
@@ -188,7 +188,6 @@ while game:
             vectorDirection[0]>0):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
-                print(1)
                 vectorDirection[0]*=(-1)
                 break
 
@@ -200,7 +199,6 @@ while game:
             vectorDirection[0]<0):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
-                print(2)
                 vectorDirection[0]*=(-1)
                 break
             # 아래에서 오는 것
@@ -211,7 +209,6 @@ while game:
             vectorDirection[1]<0):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
-                print(3)
                 vectorDirection[1]*=(-1)
                 break
             # 위에서 오는 것
@@ -222,7 +219,6 @@ while game:
             vectorDirection[1]>0):
                 # hitBrick이 True를 리턴하면 부셔진 것임
                 if(brickList[i].hitBrick()):del brickList[i]
-                print(4)
                 vectorDirection[1]*=(-1)
                 break
 
@@ -240,7 +236,6 @@ while game:
                 ball.coord[1]<=brick.topLeft[1]):
                     # hitBrick이 True를 리턴하면 부셔진 것임
                     if(brickList[i].hitBrick()):del brickList[i]
-                    print(5)
 
                     isNeighborBrick=False
                     # 위아래 네이버만 찾을게 일단.....
@@ -262,7 +257,6 @@ while game:
                 ball.coord[1]<=brick.topRight[1]):
                     # hitBrick이 True를 리턴하면 부셔진 것임
                     if(brickList[i].hitBrick()):del brickList[i]
-                    print(6)
 
                     # ball의 adjustVector 메소드를 빌림
                     # tempBallVector=ball.adjustVector(vectorDirection)
@@ -289,7 +283,6 @@ while game:
                 ball.coord[1]<=brick.bottomLeft[1]+ball.radius):
                     # hitBrick이 True를 리턴하면 부셔진 것임
                     if(brickList[i].hitBrick()):del brickList[i]
-                    print(7)
 
                     isNeighborBrick=False
                     # 위아래 네이버만 찾을게 일단.....
@@ -312,7 +305,6 @@ while game:
                 ball.coord[1]<=brick.bottomRight[1]+ball.radius):
                     # hitBrick이 True를 리턴하면 부셔진 것임
                     if(brickList[i].hitBrick()):del brickList[i]
-                    print(8)
                     isNeighborBrick=False
                     # 위아래 네이버만 찾을게 일단.....
                     for innerIndex in brickList :

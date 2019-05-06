@@ -27,8 +27,8 @@ def getReflectedVector(slope, inVector):
     outVector.append(inVector[0]+2*tValue*uVector[0])
     outVector.append(inVector[1]+2*tValue*uVector[1])
 
-    print("inVector : "+ str(inVector))
-    print("outVector : "+ str(outVector))
+    # print("inVector : "+ str(inVector))
+    # print("outVector : "+ str(outVector))
 
     # #반사벡터를 리턴
     # print(outVector)
