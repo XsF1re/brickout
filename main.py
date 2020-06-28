@@ -31,33 +31,33 @@ class drawRainbow:
             self.rgb=[0,0,0]
 
 
-pygame.init()
+pygame.init() # pygame 모듈을 사용하기 위해 초기화
 
-pygame.display.set_caption("break Bricks!")
-screen=pygame.display.set_mode((900, 600))
-clock=pygame.time.Clock()
+pygame.display.set_caption("break Bricks!") # 프로그램 창의 상단바 제목
+screen=pygame.display.set_mode((900, 600)) # 프로그램 창의 해상도 900x600으로 설정
+clock=pygame.time.Clock() # 화면을 초당 몇 번 출력하는가를 설정하기 위해 선언되는 clock 변수이며 초당 화면 출력이 게임에서는 FPS 혹은 Frame Rate라고도 한다.
 
-LOGO_IMAGE=pygame.image.load(os.path.join("logo.png"))
-MAP_WIDTH=500
-MAP_HEIGHT=500
-GAME_AREA=(30,30,30+MAP_WIDTH, 30+MAP_HEIGHT)
+LOGO_IMAGE=pygame.image.load(os.path.join("logo.png")) # 로고 이미지 불러오기
+MAP_WIDTH=500 #게임 플레이할 공간의 가로 길이
+MAP_HEIGHT=500 #게임 플레이할 공간의 세로 길이
+GAME_AREA=(30,30,30+MAP_WIDTH, 30+MAP_HEIGHT) # 게임 플레이할 공간과 실행창 사이 간격? (왼쪽 사이 간격, 위쪽 사이 간격, ...?)
 #게임 데이터들
-FAST_FPS=50
-SLOW_FPS=10
-FPS=FAST_FPS
-BAR_WIDTH=200
-BAR_HEIGHT=20
+FAST_FPS=50 #빠른 FPS
+SLOW_FPS=10 #느린 FPS
+FPS=FAST_FPS #빠른 FPS로 기본 설정
+BAR_WIDTH=200 #바 가로 길이
+BAR_HEIGHT=20 #바 세로 길이
 BAR_MOVE_WIDTH=20
 BALL_MOVE_SPEED=4
 game=True
-bar=Bar.Bar(((MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT))
+bar=Bar.Bar(((MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT)) #게임 초기 실행시 바 기본위치 (가로, 세로)
 barCoord=[(MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT]
-boundary=False  #끝에 닿았는지
+boundary=False  #끝에 닿았는지 확인
 
-RANDOM_VECTOR_SPEED=90
-randomVectorCount=1;
+RANDOM_VECTOR_SPEED=90 #???
+randomVectorCount=1; #???
 
-vectorDirection=[-2,1]
+vectorDirection=[-2,1] #공 벡터 방향
 ball=Ball((30,30), 10)
 
 drawRainbow=drawRainbow(FPS)
@@ -120,6 +120,11 @@ while game:
         # else :
         #     boundary=False
         #     barCoord[0]-=BAR_MOVE_WIDTH
+    elif(keyState[pygame.K_UP]):
+        boundary=bar.moveBar("UP")
+
+    elif(keyState[pygame.K_DOWN]):
+        boundary=bar.moveBar("DOWN")
 
     # pygame의 event를 받아봄
     for event in pygame.event.get():
@@ -145,6 +150,12 @@ while game:
                 # else:
                 #     boundary=False
                 #     barCoord[0]-= BAR_MOVE_WIDTH / 3
+            elif(event.key==pygame.K_UP):
+                boundary = bar.moveBar("UP")
+
+            elif(event.key==pygame.K_DOWN):
+                boundary = bar.moveBar("DOWN")
+
             elif(event.key==pygame.K_f):
                 # FAST와 SLOW FPS로 교대
                 if(FPS==FAST_FPS):
@@ -351,7 +362,7 @@ while game:
     lineHeight=30
     lineCount=0
     def writeGuideText(text, x, y):
-        guideFont=pygame.freetype.Font("nanum.ttf", 20)
+        guideFont=pygame.freetype.Font("CookieRun Regular.ttf", 20) #쿠키런 폰트, 크기는 20으로 지정
         guidTextSurface=guideFont.render_to(screen, (x,y), text, (100,100,100))
 
     writeGuideText("key 'A' means", 550, 200+lineHeight*lineCount)

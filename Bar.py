@@ -2,7 +2,9 @@ class Bar:
     BAR_WIDTH = 200
     BAR_HEIGHT = 20
     BAR_MOVE_WIDTH = 20
+    BAR_MOVE_HEIGHT = 20
     MAP_WIDTH = 500
+    MAP_HEIGHT = 500
     def __init__(self, *args):
         print("constructed a bar")
         self.setCoord(args[0])
@@ -28,7 +30,7 @@ class Bar:
             # 만약 끝 부분에 있다면 끝부분으로 좌표 설정
             if self.coord[0]>=Bar.MAP_WIDTH-Bar.BAR_WIDTH:
                 self.coord[0]=Bar.MAP_WIDTH-Bar.BAR_WIDTH
-                return "CRASH"
+                return "CRUSH"
 
             else :
                 self.coord[0]+=Bar.BAR_MOVE_WIDTH
@@ -43,6 +45,24 @@ class Bar:
             else:
                 self.coord[0] -= Bar.BAR_MOVE_WIDTH
 
+        if(direction == "UP"):
+            # print("go to up")
+            #
+            # print(self.coord[1])
+            if self.coord[1] <= Bar.BAR_MOVE_HEIGHT:
+                self.coord[1] = 0
+                return "CRUSH"
+            else:
+                self.coord[1] -= Bar.BAR_MOVE_HEIGHT
 
+        if(direction == "DOWN"):
+            # print("go to down")
+            #
+            #print("self.coord[1] = ", self.coord[1])
+            #print("Bar.BAR_MOVE_HEIGHT = ", Bar.BAR_MOVE_HEIGHT)
+            if self.coord[1] >= Bar.MAP_HEIGHT-Bar.BAR_HEIGHT: #500-20
+                self.coord[1]=Bar.MAP_HEIGHT-Bar.BAR_HEIGHT
+                return "CRUSH"
 
-
+            else :
+                self.coord[1] += Bar.BAR_MOVE_HEIGHT
