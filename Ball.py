@@ -10,7 +10,6 @@ class Ball:
         self.radius=15
         print("new Ball")
 
-
     # param:vectorDirection example : (1,0) (3,5)
     def move(self, vectorDirection):
         vector=self.adjustVector(vectorDirection)

@@ -45,7 +45,7 @@ GAME_AREA=(30,30,30+MAP_WIDTH, 30+MAP_HEIGHT) # 게임 플레이할 공간과 �
 FAST_FPS=50 #빠른 FPS
 SLOW_FPS=10 #느린 FPS
 FPS=FAST_FPS #빠른 FPS로 기본 설정
-BAR_WIDTH=200 #바 가로 길이
+BAR_WIDTH=100 #바 가로 길이
 BAR_HEIGHT=20 #바 세로 길이
 BAR_MOVE_WIDTH=20
 BALL_MOVE_SPEED=4
@@ -53,6 +53,7 @@ game=True
 bar=Bar.Bar(((MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT)) #게임 초기 실행시 바 기본위치 (가로, 세로)
 barCoord=[(MAP_WIDTH-BAR_WIDTH)/2,MAP_HEIGHT-BAR_HEIGHT]
 boundary=False  #끝에 닿았는지 확인
+currentLife = 10
 
 RANDOM_VECTOR_SPEED=90 #???
 randomVectorCount=1; #???
@@ -83,15 +84,10 @@ brickList={}
 def initGameDefault():
     for i in range(5):
         brickList[i]=Brick.Brick((120, Brick.Brick.HEIGHT*i), 2)
-        brickList[i+5]=Brick.Brick((300, Brick.Brick.HEIGHT*i), 2)
-def initGameTest():
-    for i in range(4):
-        brickList[i]=Brick.Brick((250, 200+Brick.Brick.HEIGHT*i), 1)
-        brickList[i+4] = Brick.Brick((50, 200 + Brick.Brick.HEIGHT * i), 1)
-        print(brickList[i].topLeft)
-        print(brickList[i].bottomLeft)
 
-# initGameTest()
+    for i in range(3):
+        brickList[i+5]=Brick.Brick((400, Brick.Brick.HEIGHT*i), 2)
+
 initGameDefault()
 while game:
 
@@ -338,7 +334,10 @@ while game:
         ball.coord[1]=bar.getY()-ball.radius
         vectorDirection[1]*=(-1)
 
-    if(ball.coord[1]>MAP_HEIGHT): ball=Ball((300,300), 10)
+    if(ball.coord[1]>MAP_HEIGHT):
+        print(currentLife)
+        currentLife -= 1;
+        ball=Ball((300,300), 10)
 
     # DRAWING BEGINS
     screen.fill((255, 255, 255))
@@ -346,8 +345,9 @@ while game:
     # pygame.gfxdraw.filled_polygon(screen, ( (GAME_AREA[0],GAME_AREA[1]), (GAME_AREA[2],GAME_AREA[1]), (GAME_AREA[2], GAME_AREA[3]), (GAME_AREA[0], GAME_AREA[3]) ), (30,30,30))
     #draw game area
     pygame.draw.rect(screen, (30, 30, 30), (GAME_AREA[0], GAME_AREA[1], MAP_WIDTH, MAP_HEIGHT), 3)
-
-    ball.move(vectorDirection)
+    pygame.draw.line(screen, (0, 0, 255), [30,400], [30+MAP_WIDTH,400],3)
+    if(currentLife > 0):
+        ball.move(vectorDirection)
     for brick in brickList:
         brickList[brick].draw(pygame.draw, screen)
     pygame.draw.circle(screen, (0,150,230),(ball.coord[0]+GAME_AREA[0], ball.coord[1]+GAME_AREA[1]), ball.radius, 3)
@@ -372,5 +372,12 @@ while game:
     writeGuideText("key 'F' means", 550, 200+lineHeight*lineCount)
     lineCount+=1
     writeGuideText("to change FPS", 550, 200+lineHeight*lineCount)
+    lineCount+=2
+
+    if(currentLife > 0):
+        currentLifeDescription = "Life: " + str(currentLife)
+        writeGuideText(currentLifeDescription, 550, 200+lineHeight*lineCount)
+    else:
+        writeGuideText("Game Over!", 550, 200+lineHeight*lineCount)
 
     pygame.display.flip()

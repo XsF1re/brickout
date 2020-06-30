@@ -1,5 +1,5 @@
 class Bar:
-    BAR_WIDTH = 200
+    BAR_WIDTH = 100
     BAR_HEIGHT = 20
     BAR_MOVE_WIDTH = 20
     BAR_MOVE_HEIGHT = 20
@@ -49,8 +49,8 @@ class Bar:
             # print("go to up")
             #
             # print(self.coord[1])
-            if self.coord[1] <= Bar.BAR_MOVE_HEIGHT:
-                self.coord[1] = 0
+            if self.coord[1] <= 370:
+                self.coord[1] = 370
                 return "CRUSH"
             else:
                 self.coord[1] -= Bar.BAR_MOVE_HEIGHT
